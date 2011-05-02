@@ -62,4 +62,12 @@
 
 #define KEYSPLITREINSERT false        //Whether to use reinsert to handle key split
 //////////////////////////////////////////////////////////////////////////////
+
+// simple MBR growth algorithm
+#define SIMPLE_MBR_GROWTH true
+
+// the accuracy radius
+#define ACCURACY 0.05
+
+
 #endif
