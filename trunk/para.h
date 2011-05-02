@@ -69,5 +69,11 @@
 // the accuracy radius
 #define ACCURACY 0.05
 
+#define TRIGGER_TIME 1
+
+// time parametric
+#define COMPUTETP true
+
+#define PREDICT_TIME 2
 
 #endif

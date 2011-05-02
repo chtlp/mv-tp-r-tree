@@ -23,6 +23,7 @@ public:
 	  //inserted.  Note that the negative edtime means unlimitedly close
 	int insertpath[256];
 	float *bounces;                     // pointer to box
+	float *velocity;
     static int create_count;
 	MVRTree *my_tree;                   // pointer to my R-tree
     MVRTNode *son_ptr;                  // pointer to son if in main mem.

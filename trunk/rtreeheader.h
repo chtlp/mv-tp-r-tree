@@ -40,8 +40,10 @@
 //These are the functions needed in various operations
 //////////////////////////////////////////////////////////////////////////////
 float area(int dimension, float *mbr);
+float area(int dimension, float *mbr, float *velocity);
 float margin(int dimension, float *mbr);
 float overlap(int dimension, float *r1, float *r2);
+float overlap(int dimension, float *r1, float *v1, float *r2, float *v2);
 float* overlapRect(int dimension, float *r1, float *r2);
 float objectDIST(float *p1, float *p2, int dim);
 float MINMAXDIST(float *Point, float *bounces, int dim);

@@ -356,12 +356,16 @@ int MVRTNode::choose_subtree2(MVREntry *e,int *cand, int &candsize, bool asign, 
 			{
 				if (COMPUTE3D)
 					old_a     = Area3D(&(entries[i]), futureed);
+				else if (COMPUTETP)
+					old_a = area(dimension, entries[i].bounces, entries[i].velocity);
 				else
 					old_a     = area(dimension,entries[i].bounces);
 				MVREntry *tmp = new MVREntry(dimension,NULL);
 				tmp->Enlarge(&entries[i],e);
 				if (COMPUTE3D)
 					a = Area3D(tmp,futureed);
+				else if (COMPUTETP)
+					a = area(dimension, entries[i].bounces, entries[i].velocity);
 				else
 					a = area(dimension,tmp->bounces);
 				f     = a - old_a;
@@ -376,6 +380,10 @@ int MVRTNode::choose_subtree2(MVREntry *e,int *cand, int &candsize, bool asign, 
 						{
 							old_o += Overlap3D(&(entries[i]),&(entries[j]),futureed);
 							o     += Overlap3D(tmp,&(entries[j]),futureed);
+						}
+						else if (COMPUTETP) {
+							old_o += overlap(dimension, entries[i].bounces, entries[i].velocity, entries[j].bounces, entries[j].velocity);
+							o += overlap(dimension, entries[i].bounces, entries[i].velocity, tmp->bounces, tmp->velocity);
 						}
 						else
 						{
@@ -403,13 +411,18 @@ int MVRTNode::choose_subtree2(MVREntry *e,int *cand, int &candsize, bool asign, 
 			{
 				if (COMPUTE3D)
 					old_a       = Area3D(&(entries[i]), futureed);
+				else if (COMPUTETP)
+					old_a = area(dimension, entries[i].bounces, entries[i].velocity);
 				else
 					old_a       = area(dimension,entries[i].bounces);
 				MVREntry *tmp = new MVREntry(dimension,NULL);
 				tmp->Enlarge(&entries[i],e);
 				if (COMPUTE3D)
 					a = Area3D(tmp,futureed);
+				else if (COMPUTETP)
+					a = area(dimension, tmp->bounces, tmp->velocity);
 				else
+
 					a = area(dimension,tmp->bounces);
 				f   = a - old_a;
 				if (f<0) error("hey, no reason for f to be less than 0\n",true);
