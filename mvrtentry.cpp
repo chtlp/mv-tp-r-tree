@@ -9,6 +9,8 @@ MVREntry::MVREntry(int _dimension, MVRTree *rt)
     dimension = _dimension;
     my_tree = rt;
     bounces = new float[2*dimension];
+	velocity = new float[4*dimension];
+	for(int i=0; i<4*dimension; ++i) velocity[i] = 0;
     son_ptr = NULL;
     son = MININT;
 	level=-1;
@@ -115,6 +117,10 @@ void MVREntry::Enlarge(MVREntry *e1, MVREntry *e2)
 	{
 		bounces[2*i]=min(e1->bounces[2*i],e2->bounces[2*i]);
 		bounces[2*i+1]=max(e1->bounces[2*i+1],e2->bounces[2*i+1]);
+		velocity[4*i] = max(e1->velocity[4*i], (e1->bounces[2*i] - (e2->bounces[2*i] - e2->velocity[4*i] * TRIGGER_TIME)) / TRIGGER_TIME);
+		velocity[4*i+1] = max(e1->velocity[4*i+1], (e2->bounces[2*i] + e2->velocity[4*i+1] * TRIGGER_TIME - e1->bounces[2*i+1]) / TRIGGER_TIME);
+		velocity[4*i+2] = max(e1->velocity[4*i+2], e2->velocity[4*i+2]);
+		velocity[4*i+3] = max(e1->velocity[4*i+3], e2->velocity[4*i+3]);
 	}
 	sttime=min(e1->sttime,e2->sttime);
 	edtime=max(e1->edtime,e2->edtime);
@@ -122,7 +128,8 @@ void MVREntry::Enlarge(MVREntry *e1, MVREntry *e2)
 //////////////////////////////////////////////////////////////////////////////
 int MVREntry::get_size()
 {
-    return 2*dimension * sizeof(float) + sizeof(int) + sizeof(int) + sizeof(int);
+	// v1, v2 is added to two directions of each dimension
+    return 6*dimension * sizeof(float) + sizeof(int) + sizeof(int) + sizeof(int);
 	// 2*dimension floats + son int + sttime int + edtime int
 }
 
@@ -166,7 +173,9 @@ void MVREntry::GetBound(int ind, MVRTNode *rn)
 {
 	for (int i=0;i<dimension;i++)
 	{bounces[2*i]=MAXREAL; bounces[2*i+1]=MINREAL;
-	 sttime=MAXINT; edtime=MININT;}
+	 sttime=MAXINT; edtime=MININT;
+	 velocity[4*i] = velocity[4*i+1] = velocity[4*i+2] = velocity[4*i+3] = 0;
+	}
 
 	for (int i=0;i<rn->num_entries;i++)
 	{
@@ -177,6 +186,15 @@ void MVREntry::GetBound(int ind, MVRTNode *rn)
 				bounces[2*j]=min(bounces[2*j],rn->entries[i].bounces[2*j]);
 				bounces[2*j+1]=max(bounces[2*j+1],rn->entries[i].bounces[2*j+1]);
 				sttime=min(sttime,rn->entries[i].sttime); edtime=max(edtime,rn->entries[i].edtime);
+			}
+
+			for (int j=0; j<dimension; j++) {
+				MVREntry* entry = &rn->entries[i];
+				velocity[4*j] = max(velocity[4*j], (bounces[2*j] - entry->bounces[2*j] + entry->velocity[4*j]*TRIGGER_TIME) / TRIGGER_TIME );
+				velocity[4*j+1] = max(velocity[4*j], (entry->bounces[2*j+1] + entry->velocity[4*j+1]*TRIGGER_TIME - bounces[2*j+1]) / TRIGGER_TIME );
+				velocity[4*j+2] = max(velocity[4*j+2], rn->entries[i].velocity[4*j+2]);
+				velocity[4*j+3] = max(velocity[4*j+3], rn->entries[i].velocity[4*j+3]);
+
 			}
 		}
 	}
